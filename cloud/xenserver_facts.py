@@ -54,7 +54,8 @@ class XenServerFacts:
             '5.6.100': 'oxford',
             '6.0.0': 'boston',
             '6.1.0': 'tampa',
-            '6.2.0': 'clearwater'
+            '6.2.0': 'clearwater',
+            '6.5.0': 'creedence'
         }
 
     @property
