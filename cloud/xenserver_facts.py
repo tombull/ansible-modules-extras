@@ -30,6 +30,15 @@ author:
 import platform
 import XenAPI
 
+from itertools import repeat
+
+try:
+    # Python 2
+    from itertools import imap
+except ImportError:
+    # Python 3
+    imap = map
+
 EXAMPLES = '''
 - name: Gather facts from xenserver
    xenserver:
@@ -135,7 +144,7 @@ def get_host(session):
 
 def get_vms(session):
     xs_vms = {}
-    recs = session.xenapi.VM.get_all()
+    recs = session.xenapi.VM.get_all_records()
     if not recs:
         return None
 
@@ -154,6 +163,18 @@ def get_srs(session):
     for sr in srs.itervalues():
        xs_srs[sr['name_label']] = sr
     return xs_srs
+    
+def convert_non_json_entities(data):
+    if not reduce(lambda x, y: x or y, imap(isinstance, repeat(data), (dict, list, tuple, str, unicode, int, long, float, bool, type(None)))):
+        return str(data)
+    elif isinstance(data, dict):
+        return dict(imap(convert_non_json_entities, iteritems(data)))
+    elif isinstance(data, list):
+        return list(imap(convert_non_json_entities, data))
+    elif isinstance(data, tuple):
+        return tuple(imap(convert_non_json_entities, data))
+    else:
+        return data
 
 def main():
     module = AnsibleModule({})
@@ -183,7 +204,7 @@ def main():
         data['xs_networks'] = xs_networks
 
     if xs_vms:
-        data['xs_vms'] = xs_vms
+        data['xs_vms'] = convert_non_json_entities(xs_vms)
 
     if xs_srs:
         data['xs_srs'] = xs_srs
