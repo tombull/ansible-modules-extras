@@ -117,13 +117,14 @@ def change_keys(recs, key='uuid', filter_func=None):
 
     """
     new_recs = {}
+    
+    if hasattr(recs, 'iteritems'):
+        for ref, rec in recs.iteritems():
+            if filter_func is not None and not filter_func(rec):
+                continue
 
-    for ref, rec in recs.iteritems():
-        if filter_func is not None and not filter_func(rec):
-            continue
-
-        new_recs[rec[key]] = rec
-        new_recs[rec[key]]['ref'] = ref
+            new_recs[rec[key]] = rec
+            new_recs[rec[key]]['ref'] = ref
 
     return new_recs
 
