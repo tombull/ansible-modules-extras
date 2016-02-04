@@ -32,7 +32,7 @@ import XenAPI
 
 EXAMPLES = '''
 - name: Gather facts from xenserver
-   xenserver:
+   xenserver_facts:
 
 - name: Print running VMs
   debug: msg="{{ item }}"
